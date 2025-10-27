@@ -1,5 +1,5 @@
 """
-Waveform style configuration dialog for the Audio Recorder application.
+Waveform style configuration dialog for B.L.A.D.E. (Brister's Linguistic Audio Dictation Engine).
 Shows live previews of all available waveform styles in a grid layout.
 """
 import tkinter as tk

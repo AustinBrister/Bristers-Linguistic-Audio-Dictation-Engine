@@ -1,5 +1,5 @@
 """
-Hotkey management for the Audio Recorder application.
+Hotkey management for B.L.A.D.E. (Brister's Linguistic Audio Dictation Engine).
 """
 import keyboard
 import time

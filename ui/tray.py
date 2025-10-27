@@ -1,5 +1,5 @@
 """
-System tray management for the Audio Recorder application.
+System tray management for B.L.A.D.E. (Brister's Linguistic Audio Dictation Engine).
 """
 import pystray
 import threading
@@ -36,7 +36,7 @@ class TrayManager:
             pystray.MenuItem('Exit', self._on_quit_clicked)
         )
         
-        self.tray_icon = pystray.Icon("audio_recorder", icon_data, "Audio Recorder", menu)
+        self.tray_icon = pystray.Icon("blade", icon_data, "B.L.A.D.E.", menu)
     
     def _on_show_clicked(self, *_):
         """Handle show menu item click."""

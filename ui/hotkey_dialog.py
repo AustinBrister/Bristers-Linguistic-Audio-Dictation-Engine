@@ -1,5 +1,5 @@
 """
-Hotkey configuration dialog for the Audio Recorder application.
+Hotkey configuration dialog for B.L.A.D.E. (Brister's Linguistic Audio Dictation Engine).
 """
 import tkinter as tk
 from tkinter import messagebox

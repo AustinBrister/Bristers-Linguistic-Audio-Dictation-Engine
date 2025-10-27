@@ -1,5 +1,5 @@
 """
-Modern waveform overlay for the Audio Recorder application.
+Modern waveform overlay for B.L.A.D.E. (Brister's Linguistic Audio Dictation Engine).
 Provides real-time audio visualization and stylized status animations.
 Refactored to use the pluggable style system.
 """

@@ -1,3 +1,3 @@
 """
-Test package for the Audio Recorder application.
+Test package for B.L.A.D.E. (Brister's Linguistic Audio Dictation Engine).
 """ 

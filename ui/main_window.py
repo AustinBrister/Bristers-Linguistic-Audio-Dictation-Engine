@@ -1,5 +1,5 @@
 """
-Main window UI component for the Audio Recorder application.
+Main window UI component for B.L.A.D.E. (Brister's Linguistic Audio Dictation Engine).
 """
 import tkinter as tk
 from tkinter import messagebox, ttk
@@ -12,7 +12,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 from config import config
 from recorder import AudioRecorder
-from transcriber import TranscriptionBackend, LocalWhisperBackend, OpenAIBackend
+from transcriber import TranscriptionBackend, LocalWhisperBackend
 from hotkey_manager import HotkeyManager
 from settings import settings_manager
 from audio_processor import audio_processor
@@ -123,7 +123,7 @@ class MainWindow:
     def __init__(self):
         """Initialize the main window."""
         self.root = tk.Tk()
-        self.root.title("Audio Recorder")
+        self.root.title("B.L.A.D.E.")
         self.root.geometry(config.MAIN_WINDOW_SIZE)
         self.root.withdraw()  # Hide initially
         
@@ -174,15 +174,9 @@ class MainWindow:
         """Initialize transcription backends."""
         # Local Whisper backend
         self.transcription_backends['local_whisper'] = LocalWhisperBackend()
-        
-        # OpenAI backends
-        self.transcription_backends['api_whisper'] = OpenAIBackend('api_whisper')
-        self.transcription_backends['api_gpt4o'] = OpenAIBackend('api_gpt4o')
-        self.transcription_backends['api_gpt4o_mini'] = OpenAIBackend('api_gpt4o_mini')
-        
-        # Load saved model selection and set backend
-        saved_model = settings_manager.load_model_selection()
-        self.current_backend = self.transcription_backends.get(saved_model, self.transcription_backends['local_whisper'])
+
+        # Set to local whisper backend (only option)
+        self.current_backend = self.transcription_backends['local_whisper']
     
     def _setup_gui(self):
         """Create and configure the main GUI interface."""

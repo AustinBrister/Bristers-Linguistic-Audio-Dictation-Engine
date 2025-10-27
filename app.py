@@ -1,5 +1,5 @@
 """
-Main application bootstrap for the Audio Recorder.
+Main application bootstrap for B.L.A.D.E. (Brister's Linguistic Audio Dictation Engine).
 """
 import logging
 import os
@@ -26,7 +26,7 @@ def main():
     """Main application entry point."""
     # Setup logging
     setup_logging()
-    logging.info("Starting Audio Recorder application")
+    logging.info("Starting B.L.A.D.E. (Brister's Linguistic Audio Dictation Engine)")
 
     loading_screen = None
     try:

@@ -1,5 +1,5 @@
 """
-Configuration constants for the Audio Recorder application.
+Configuration constants for B.L.A.D.E. (Brister's Linguistic Audio Dictation Engine).
 """
 from dataclasses import dataclass
 from typing import Dict, Tuple
@@ -7,12 +7,12 @@ from typing import Dict, Tuple
 
 @dataclass
 class AppConfig:
-    """Centralized configuration for the Audio Recorder application."""
-    
+    """Centralized configuration for B.L.A.D.E. (Brister's Linguistic Audio Dictation Engine)."""
+
     # File paths
-    SETTINGS_FILE: str = "audio_recorder_settings.json"
-    RECORDED_AUDIO_FILE: str = "recorded_audio.wav"
-    LOG_FILE: str = "audio_recorder.log"
+    SETTINGS_FILE: str = "blade_settings.json"
+    RECORDED_AUDIO_FILE: str = "blade_recording.wav"
+    LOG_FILE: str = "blade.log"
     ENV_FILE: str = ".env"
     
     # Audio settings
@@ -27,9 +27,6 @@ class AppConfig:
     # Model configurations
     MODEL_CHOICES: Tuple[str, ...] = (
         'Local Whisper',
-        'API: Whisper',
-        'API: GPT-4o Transcribe',
-        'API: GPT-4o Mini Transcribe'
     )
     
     MODEL_VALUE_MAP: Dict[str, str] = None
@@ -88,10 +85,7 @@ class AppConfig:
         
         if self.MODEL_VALUE_MAP is None:
             self.MODEL_VALUE_MAP = {
-                'Local Whisper': 'local_whisper',
-                'API: Whisper': 'api_whisper',
-                'API: GPT-4o Transcribe': 'api_gpt4o',
-                'API: GPT-4o Mini Transcribe': 'api_gpt4o_mini'
+                'Local Whisper': 'local_whisper'
             }
         
         if self.WAVEFORM_STYLE_CONFIGS is None:

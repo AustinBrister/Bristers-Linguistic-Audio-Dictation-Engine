@@ -1,5 +1,5 @@
 """
-Settings management for the Audio Recorder application.
+Settings management for B.L.A.D.E. (Brister's Linguistic Audio Dictation Engine).
 """
 import json
 import os

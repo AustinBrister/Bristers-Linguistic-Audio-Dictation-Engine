@@ -1,5 +1,5 @@
 """
-Loading screen UI component for the Audio Recorder application.
+Loading screen UI component for B.L.A.D.E. (Brister's Linguistic Audio Dictation Engine).
 Simple, fast static loading screen with no animations.
 """
 import tkinter as tk
@@ -26,23 +26,23 @@ class LoadingScreen:
         """Create and display a simple static loading screen."""
         try:
             self.root = tk.Tk()
-            self.root.title("Audio Recorder")
+            self.root.title("B.L.A.D.E.")
             self.root.geometry("320x180")
             self.root.resizable(False, False)
             self.root.attributes('-topmost', True)
             self.root.configure(bg=self._bg_color)
-            
+
             # Center the loading screen
             self.root.eval('tk::PlaceWindow . center')
-            
+
             # Create main frame
             main_frame = tk.Frame(self.root, bg=self._bg_color)
             main_frame.pack(fill=tk.BOTH, expand=True, padx=25, pady=25)
-            
+
             # App title
             title_label = tk.Label(
                 main_frame,
-                text="Audio Recorder",
+                text="B.L.A.D.E.",
                 font=("Segoe UI", 20, "bold"),
                 bg=self._bg_color,
                 fg=self._accent_color,

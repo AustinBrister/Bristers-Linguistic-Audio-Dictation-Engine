@@ -1,5 +1,5 @@
 """
-Audio recording functionality for the Audio Recorder application.
+Audio recording functionality for B.L.A.D.E. (Brister's Linguistic Audio Dictation Engine).
 """
 import pyaudio
 import wave
