@@ -58,7 +58,7 @@ Choose from 7 distinct real-time visualization styles for the status overlay:
 ## Prerequisites
 
 ### System Requirements
-- **Python 3.8+**
+- **Python 3.8+** (note: Python 3.14 not working; use Python 3.13)
 - **Windows** (due to keyboard library requirements)
 
 ### Required Dependencies
