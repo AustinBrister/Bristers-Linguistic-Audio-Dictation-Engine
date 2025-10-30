@@ -2,13 +2,14 @@
 Main window UI component for the Audio Recorder application.
 """
 import tkinter as tk
-from tkinter import messagebox, ttk
+from tkinter import messagebox, ttk, filedialog
 import threading
 import logging
 import pyperclip
 import keyboard
 from typing import Optional, Callable, Dict
 from concurrent.futures import ThreadPoolExecutor
+import os
 
 from config import config
 from recorder import AudioRecorder
@@ -124,8 +125,9 @@ class MainWindow:
         """Initialize the main window."""
         self.root = tk.Tk()
         self.root.title("B.L.A.D.E. - Brister's Linguistic Audio Dictation Engine")
-        self.root.geometry("350x250")
+        self.root.geometry("450x400")
         self.root.withdraw()  # Hide initially
+        self.root.configure(bg=config.WAVEFORM_BG_COLOR)
         
         # Initialize components
         self.recorder = AudioRecorder()
@@ -141,6 +143,7 @@ class MainWindow:
         self.start_button: Optional[ttk.Button] = None
         self.stop_button: Optional[ttk.Button] = None
         self.cancel_button: Optional[ttk.Button] = None
+        self.open_file_button: Optional[ttk.Button] = None
         
         # Status management
         self.status_controller = UIStatusController(self)
@@ -183,6 +186,8 @@ class MainWindow:
         # Create File menu
         file_menu = tk.Menu(menubar, tearoff=0)
         menubar.add_cascade(label="File", menu=file_menu)
+        file_menu.add_command(label="Open Audio File...", command=self.open_audio_file)
+        file_menu.add_separator()
         file_menu.add_command(label="Exit", command=self.quit_app)
         
         # Create Settings menu
@@ -192,19 +197,19 @@ class MainWindow:
         settings_menu.add_command(label="Waveform Style...", command=self.open_waveform_style_settings)
         settings_menu.add_command(label="Configure FFmpeg...", command=self.configure_ffmpeg)
         
-        
-        # Main frame with padding
-        main_frame = ttk.Frame(self.root, padding=10)
+
+        # Main frame with padding - use tk.Frame for custom background
+        main_frame = tk.Frame(self.root, bg=config.WAVEFORM_BG_COLOR, padx=20, pady=15)
         main_frame.pack(fill=tk.BOTH, expand=True)
 
         # Header with B.L.A.D.E. branding
         header_frame = tk.Frame(main_frame, bg=config.WAVEFORM_BG_COLOR)
-        header_frame.pack(fill=tk.X, pady=(0, 10))
+        header_frame.pack(fill=tk.X, pady=(0, 15))
 
         title_label = tk.Label(
             header_frame,
             text="B.L.A.D.E.",
-            font=("Segoe UI", 16, "bold"),
+            font=("Segoe UI", 20, "bold"),
             bg=config.WAVEFORM_BG_COLOR,
             fg=config.WAVEFORM_ACCENT_COLOR,
             pady=5
@@ -214,37 +219,154 @@ class MainWindow:
         subtitle_label = tk.Label(
             header_frame,
             text="Brister's Linguistic Audio Dictation Engine",
-            font=("Segoe UI", 8),
+            font=("Segoe UI", 9),
             bg=config.WAVEFORM_BG_COLOR,
-            fg="#b0b0b0",
+            fg="#909090",
             pady=2
         )
         subtitle_label.pack()
 
-        # Status label
-        self.status_label = ttk.Label(main_frame, text="Status: Ready", font=("Segoe UI", 9))
-        self.status_label.pack(pady=5)
+        # Separator line
+        separator = tk.Frame(main_frame, height=2, bg=config.WAVEFORM_SECONDARY_COLOR)
+        separator.pack(fill=tk.X, pady=(0, 15))
 
-        # Buttons frame
-        buttons_frame = ttk.Frame(main_frame)
-        buttons_frame.pack(pady=10, fill=tk.X)
-        
-        self.start_button = ttk.Button(buttons_frame, text="Start Recording", 
-                                      command=self.start_recording)
-        self.start_button.pack(side=tk.LEFT, expand=True, fill=tk.X, padx=5)
-        
-        self.stop_button = ttk.Button(buttons_frame, text="Stop Recording", 
-                                     command=self.stop_recording, state=tk.DISABLED)
-        self.stop_button.pack(side=tk.LEFT, expand=True, fill=tk.X, padx=5)
-        
-        self.cancel_button = ttk.Button(main_frame, text="Stop", 
-                                       command=self.cancel_transcription, state=tk.DISABLED)
-        self.cancel_button.pack(pady=5, fill=tk.X)
-        
-        # Transcription display
-        self.transcription_text = tk.Text(main_frame, height=3, wrap=tk.WORD, relief=tk.FLAT,
-                                         font=('TkDefaultFont', 9), bg=self.root.cget('bg'))
-        self.transcription_text.pack(padx=0, pady=(10, 0), fill=tk.X)
+        # Status label with modern styling
+        status_frame = tk.Frame(main_frame, bg="#2a2a2a", bd=0)
+        status_frame.pack(fill=tk.X, pady=(0, 15))
+
+        self.status_label = tk.Label(
+            status_frame,
+            text="Status: Ready",
+            font=("Segoe UI", 10),
+            bg="#2a2a2a",
+            fg=config.WAVEFORM_TEXT_COLOR,
+            pady=8,
+            padx=10
+        )
+        self.status_label.pack(fill=tk.X)
+
+        # Recording buttons frame
+        recording_frame = tk.Frame(main_frame, bg=config.WAVEFORM_BG_COLOR)
+        recording_frame.pack(pady=(0, 10), fill=tk.X)
+
+        # Configure custom button style
+        style = ttk.Style()
+        style.theme_use('clam')
+
+        # Start button style (accent color)
+        style.configure('Start.TButton',
+                       background=config.WAVEFORM_ACCENT_COLOR,
+                       foreground='white',
+                       borderwidth=0,
+                       focuscolor='none',
+                       font=('Segoe UI', 10, 'bold'),
+                       padding=10)
+        style.map('Start.TButton',
+                 background=[('active', config.WAVEFORM_SECONDARY_COLOR)])
+
+        # Stop button style (warning color)
+        style.configure('Stop.TButton',
+                       background='#ff6b6b',
+                       foreground='white',
+                       borderwidth=0,
+                       focuscolor='none',
+                       font=('Segoe UI', 10, 'bold'),
+                       padding=10)
+        style.map('Stop.TButton',
+                 background=[('active', '#ff5252')])
+
+        # Cancel button style
+        style.configure('Cancel.TButton',
+                       background='#444444',
+                       foreground='white',
+                       borderwidth=0,
+                       focuscolor='none',
+                       font=('Segoe UI', 9),
+                       padding=8)
+        style.map('Cancel.TButton',
+                 background=[('active', '#555555')])
+
+        # File button style
+        style.configure('File.TButton',
+                       background=config.WAVEFORM_SECONDARY_COLOR,
+                       foreground='white',
+                       borderwidth=0,
+                       focuscolor='none',
+                       font=('Segoe UI', 10),
+                       padding=10)
+        style.map('File.TButton',
+                 background=[('active', '#007aa3')])
+
+        self.start_button = ttk.Button(
+            recording_frame,
+            text="🎤 Start Recording",
+            command=self.start_recording,
+            style='Start.TButton'
+        )
+        self.start_button.pack(side=tk.LEFT, expand=True, fill=tk.X, padx=(0, 5))
+
+        self.stop_button = ttk.Button(
+            recording_frame,
+            text="⏹ Stop Recording",
+            command=self.stop_recording,
+            state=tk.DISABLED,
+            style='Stop.TButton'
+        )
+        self.stop_button.pack(side=tk.LEFT, expand=True, fill=tk.X, padx=(5, 0))
+
+        # Open file button
+        self.open_file_button = ttk.Button(
+            main_frame,
+            text="📁 Open Audio File",
+            command=self.open_audio_file,
+            style='File.TButton'
+        )
+        self.open_file_button.pack(pady=(0, 10), fill=tk.X)
+
+        # Cancel button
+        self.cancel_button = ttk.Button(
+            main_frame,
+            text="✖ Cancel",
+            command=self.cancel_transcription,
+            state=tk.DISABLED,
+            style='Cancel.TButton'
+        )
+        self.cancel_button.pack(pady=(0, 15), fill=tk.X)
+
+        # Transcription display section
+        transcription_label = tk.Label(
+            main_frame,
+            text="Transcription",
+            font=("Segoe UI", 10, "bold"),
+            bg=config.WAVEFORM_BG_COLOR,
+            fg=config.WAVEFORM_ACCENT_COLOR,
+            anchor='w'
+        )
+        transcription_label.pack(fill=tk.X, pady=(0, 5))
+
+        # Scrollable text frame
+        text_frame = tk.Frame(main_frame, bg="#2a2a2a", bd=1, relief=tk.SOLID)
+        text_frame.pack(fill=tk.BOTH, expand=True)
+
+        # Add scrollbar
+        scrollbar = tk.Scrollbar(text_frame)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+        self.transcription_text = tk.Text(
+            text_frame,
+            height=5,
+            wrap=tk.WORD,
+            relief=tk.FLAT,
+            font=('Segoe UI', 9),
+            bg="#2a2a2a",
+            fg=config.WAVEFORM_TEXT_COLOR,
+            insertbackground=config.WAVEFORM_ACCENT_COLOR,
+            padx=10,
+            pady=10,
+            yscrollcommand=scrollbar.set
+        )
+        self.transcription_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        scrollbar.config(command=self.transcription_text.yview)
         self.transcription_text.config(state=tk.DISABLED)
     
     def _setup_hotkeys(self):
@@ -297,6 +419,7 @@ class MainWindow:
             self.start_button.config(state=tk.DISABLED)
             self.stop_button.config(state=tk.NORMAL)
             self.cancel_button.config(state=tk.NORMAL)
+            self.open_file_button.config(state=tk.DISABLED)
             self.status_controller.update_status("Recording...")
             logging.info("Recording started from GUI")
     
@@ -367,27 +490,32 @@ class MainWindow:
     def cancel_transcription(self):
         """Cancel recording or transcription."""
         logging.info(f"Cancel called. Recording: {self.recorder.is_recording}, Transcribing: {self.current_backend and self.current_backend.is_transcribing}")
-        
+
         if self.recorder.is_recording:
             self.recorder.stop_recording()
             # Clear the recording data since it was cancelled
             self.recorder.clear_recording_data()
             self.start_button.config(state=tk.NORMAL)
             self.stop_button.config(state=tk.DISABLED)
+            self.open_file_button.config(state=tk.NORMAL)
             # Show cancelling animation
             self.status_controller.waveform_overlay.show_canceling("Recording Cancelled")
             logging.info("Recording cancelled and data cleared")
-        
+
         elif self.current_backend and self.current_backend.is_transcribing:
             self.current_backend.cancel_transcription()
+            self.start_button.config(state=tk.NORMAL)
+            self.open_file_button.config(state=tk.NORMAL)
             # Show cancelling animation
             self.status_controller.waveform_overlay.show_canceling("Transcription Cancelled")
             logging.info("Transcription cancelled")
-        
+
         else:
             # If neither recording nor transcribing, still show a brief cancellation message
             self.status_controller.waveform_overlay.show_canceling("Cancelled")
-        
+            self.start_button.config(state=tk.NORMAL)
+            self.open_file_button.config(state=tk.NORMAL)
+
         self.cancel_button.config(state=tk.DISABLED)
     
     def _transcribe_audio(self):
@@ -465,27 +593,29 @@ class MainWindow:
         self.transcription_text.delete(1.0, tk.END)
         self.transcription_text.insert(tk.END, f"Transcription: {transcribed_text}")
         self.transcription_text.config(state=tk.DISABLED)
-        
+
         # Auto-paste the transcription
         self._paste_text(transcribed_text)
-        
+
         # Clear the overlay and update status
         self.status_controller.clear_status()
         self.status_controller.update_status("Ready (Pasted)", show_overlay=False)
         self.cancel_button.config(state=tk.DISABLED)
         self.start_button.config(state=tk.NORMAL)
-        
+        self.open_file_button.config(state=tk.NORMAL)
+
         logging.info("Transcription completed and pasted")
     
     def _on_transcription_error(self, error_message: str):
         """Handle transcription error on main thread."""
         # Clear the overlay first
         self.status_controller.clear_status()
-        
+
         messagebox.showerror("Error", f"Transcription failed: {error_message}")
         self.status_controller.update_status("Ready", show_overlay=False)
         self.cancel_button.config(state=tk.DISABLED)
         self.start_button.config(state=tk.NORMAL)
+        self.open_file_button.config(state=tk.NORMAL)
     
     def _paste_text(self, text: str):
         """Paste text at current cursor position."""
@@ -547,9 +677,139 @@ class MainWindow:
         except Exception as e:
             logging.error(f"Failed to open FFmpeg dialog: {e}")
             messagebox.showerror("Error", f"Failed to open FFmpeg configuration: {e}")
-    
-    
-    
+
+    def open_audio_file(self):
+        """Open an existing audio file for transcription."""
+        # Define supported file types
+        filetypes = (
+            ('Audio Files', '*.wav *.mp3 *.m4a *.flac *.ogg *.aac *.wma'),
+            ('WAV files', '*.wav'),
+            ('MP3 files', '*.mp3'),
+            ('M4A files', '*.m4a'),
+            ('FLAC files', '*.flac'),
+            ('OGG files', '*.ogg'),
+            ('All files', '*.*')
+        )
+
+        # Open file dialog
+        filename = filedialog.askopenfilename(
+            title='Open Audio File',
+            initialdir=os.path.expanduser('~'),
+            filetypes=filetypes
+        )
+
+        if not filename:
+            # User cancelled
+            return
+
+        # Verify file exists
+        if not os.path.exists(filename):
+            messagebox.showerror("Error", f"File not found: {filename}")
+            return
+
+        # Check file size
+        file_size = os.path.getsize(filename)
+        if file_size < 100:
+            messagebox.showerror("Error", "Audio file is too small or empty")
+            return
+
+        logging.info(f"Opening audio file: {filename} ({file_size} bytes)")
+
+        # Disable buttons during transcription
+        self.start_button.config(state=tk.DISABLED)
+        self.stop_button.config(state=tk.DISABLED)
+        self.open_file_button.config(state=tk.DISABLED)
+        self.cancel_button.config(state=tk.NORMAL)
+
+        # Update status
+        self.status_controller.update_status("Processing audio file...")
+
+        # Start transcription in background
+        try:
+            needs_splitting, file_size_mb = audio_processor.check_file_size(filename)
+
+            if needs_splitting:
+                logging.info(f"Large file detected ({file_size_mb:.2f} MB), starting split workflow")
+                self.status_controller.update_status(f"Processing large file ({file_size_mb:.1f} MB)...")
+                future = self.executor.submit(self._transcribe_large_audio_from_file, filename)
+            else:
+                # Normal transcription workflow
+                future = self.executor.submit(self._transcribe_audio_from_file, filename)
+
+        except Exception as e:
+            logging.error(f"Failed to process audio file: {e}")
+            self._on_transcription_error(f"Failed to process audio file: {e}")
+            self.open_file_button.config(state=tk.NORMAL)
+
+    def _transcribe_audio_from_file(self, audio_file: str):
+        """Transcribe audio from an existing file in background thread."""
+        try:
+            self.status_controller.update_status("Transcribing...")
+
+            # Transcribe using current backend
+            transcribed_text = self.current_backend.transcribe(audio_file)
+
+            # Update UI on main thread
+            self.root.after(0, self._on_transcription_complete, transcribed_text)
+
+        except Exception as e:
+            logging.error(f"Transcription failed: {e}")
+            self.root.after(0, self._on_transcription_error, str(e))
+
+    def _transcribe_large_audio_from_file(self, audio_file: str):
+        """Transcribe large audio file by splitting it into chunks."""
+        chunk_files = []
+        try:
+            # Add status update immediately when large audio processing starts
+            self.root.after(0, lambda: self.status_controller.update_status("Processing large audio file..."))
+
+            # Step 1: Split the audio file
+            def progress_callback(message):
+                """Update status with splitting progress."""
+                self.root.after(0, lambda: self.status_controller.update_status(message))
+
+            chunk_files = audio_processor.split_audio_file(audio_file, progress_callback)
+
+            if not chunk_files:
+                raise Exception("Failed to split audio file into chunks")
+
+            # Step 2: Check if backend supports chunked transcription
+            if hasattr(self.current_backend, 'transcribe_chunks'):
+                # Use backend's chunked transcription if available
+                self.root.after(0, lambda: self.status_controller.update_status(f"Transcribing {len(chunk_files)} chunks..."))
+                transcribed_text = self.current_backend.transcribe_chunks(chunk_files)
+            else:
+                # Fallback: transcribe chunks individually and combine
+                transcriptions = []
+                for i, chunk_file in enumerate(chunk_files):
+                    # Create a proper closure for the lambda
+                    current_chunk = i + 1
+                    total_chunks = len(chunk_files)
+                    self.root.after(0, lambda: self.status_controller.update_status(f"Transcribing chunk {current_chunk}/{total_chunks}..."))
+
+                    chunk_transcription = self.current_backend.transcribe(chunk_file)
+                    transcriptions.append(chunk_transcription)
+
+                    logging.info(f"Completed chunk {current_chunk}/{total_chunks}")
+
+                # Combine transcriptions
+                self.root.after(0, lambda: self.status_controller.update_status("Combining transcriptions..."))
+                transcribed_text = audio_processor.combine_transcriptions(transcriptions)
+
+            # Update UI on main thread
+            self.root.after(0, self._on_transcription_complete, transcribed_text)
+
+        except Exception as e:
+            logging.error(f"Large audio transcription failed: {e}")
+            self.root.after(0, self._on_transcription_error, str(e))
+        finally:
+            # Cleanup temporary chunk files
+            try:
+                audio_processor.cleanup_temp_files()
+            except Exception as cleanup_error:
+                logging.warning(f"Failed to cleanup temp files: {cleanup_error}")
+
+
     def quit_app(self):
         """Quit the application."""
         logging.info("Quitting application")
