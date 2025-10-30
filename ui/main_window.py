@@ -671,9 +671,9 @@ class MainWindow:
     def configure_ffmpeg(self):
         """Open FFmpeg configuration dialog."""
         try:
-            from .ffmpeg_dialog import FFmpegDialog
-            dialog = FFmpegDialog(self.root)
-            dialog.show()
+            from .ffmpeg_dialog import FFmpegConfigDialog
+            dialog = FFmpegConfigDialog(self.root)
+            dialog.show_config_dialog()
         except Exception as e:
             logging.error(f"Failed to open FFmpeg dialog: {e}")
             messagebox.showerror("Error", f"Failed to open FFmpeg configuration: {e}")
