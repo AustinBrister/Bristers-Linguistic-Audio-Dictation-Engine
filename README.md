@@ -58,7 +58,7 @@ Choose from 7 distinct real-time visualization styles for the status overlay:
 ## Prerequisites
 
 ### System Requirements
-- **Python 3.8+**
+- **Python 3.8-3.13** (Python 3.14+ not supported due to PyAudio compatibility)
 - **Windows** (due to keyboard library requirements)
 
 ### Required Dependencies
@@ -143,7 +143,7 @@ The application uses these optimized audio settings:
 
 **Application won't start:**
 - Verify all dependencies are installed: `pip install -r requirements.txt`
-- Check Python version is 3.8 or higher
+- Check Python version is between 3.8 and 3.13 (3.14+ not compatible with PyAudio)
 - Ensure PyAudio can access your audio devices
 - Check for missing Visual C++ redistributables on Windows
 

@@ -1,3 +1,4 @@
+# Requires Python 3.8-3.13 (Python 3.14+ not compatible with PyAudio 0.2.14)
 pyaudio==0.2.14
 numpy>=1.24.0
 keyboard>=0.13.5
