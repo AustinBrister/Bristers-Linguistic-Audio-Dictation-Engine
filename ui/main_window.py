@@ -125,7 +125,7 @@ class MainWindow:
         """Initialize the main window."""
         self.root = tk.Tk()
         self.root.title("B.L.A.D.E. - Brister's Linguistic Audio Dictation Engine")
-        self.root.geometry("450x400")
+        self.root.geometry("480x450")
         self.root.withdraw()  # Hide initially
         self.root.configure(bg=config.WAVEFORM_BG_COLOR)
         
@@ -202,46 +202,59 @@ class MainWindow:
         main_frame = tk.Frame(self.root, bg=config.WAVEFORM_BG_COLOR, padx=20, pady=15)
         main_frame.pack(fill=tk.BOTH, expand=True)
 
-        # Header with B.L.A.D.E. branding
+        # Header with B.L.A.D.E. branding - Modern elevated design
         header_frame = tk.Frame(main_frame, bg=config.WAVEFORM_BG_COLOR)
-        header_frame.pack(fill=tk.X, pady=(0, 15))
+        header_frame.pack(fill=tk.X, pady=(5, 20))
 
+        # Main title with dramatic size
         title_label = tk.Label(
             header_frame,
             text="B.L.A.D.E.",
-            font=("Segoe UI", 20, "bold"),
+            font=("Segoe UI", 42, "bold"),
             bg=config.WAVEFORM_BG_COLOR,
             fg=config.WAVEFORM_ACCENT_COLOR,
-            pady=5
+            pady=8
         )
         title_label.pack()
 
+        # Subtitle with increased prominence and elegant spacing
         subtitle_label = tk.Label(
             header_frame,
             text="Brister's Linguistic Audio Dictation Engine",
-            font=("Segoe UI", 9),
+            font=("Segoe UI", 13, "normal"),
             bg=config.WAVEFORM_BG_COLOR,
-            fg="#909090",
-            pady=2
+            fg="#b0b0b0",
+            pady=5
         )
         subtitle_label.pack()
 
-        # Separator line
-        separator = tk.Frame(main_frame, height=2, bg=config.WAVEFORM_SECONDARY_COLOR)
-        separator.pack(fill=tk.X, pady=(0, 15))
+        # Modern gradient-style separator (dual line effect)
+        separator_container = tk.Frame(main_frame, bg=config.WAVEFORM_BG_COLOR)
+        separator_container.pack(fill=tk.X, pady=(0, 18))
 
-        # Status label with modern styling
-        status_frame = tk.Frame(main_frame, bg="#2a2a2a", bd=0)
-        status_frame.pack(fill=tk.X, pady=(0, 15))
+        separator_top = tk.Frame(separator_container, height=1, bg=config.WAVEFORM_ACCENT_COLOR)
+        separator_top.pack(fill=tk.X)
+
+        tk.Frame(separator_container, height=2, bg=config.WAVEFORM_BG_COLOR).pack()
+
+        separator_bottom = tk.Frame(separator_container, height=1, bg=config.WAVEFORM_SECONDARY_COLOR)
+        separator_bottom.pack(fill=tk.X)
+
+        # Status label with elevated modern styling and subtle border
+        status_outer = tk.Frame(main_frame, bg=config.WAVEFORM_SECONDARY_COLOR, bd=0)
+        status_outer.pack(fill=tk.X, pady=(0, 18))
+
+        status_frame = tk.Frame(status_outer, bg="#2a2a2a", bd=0)
+        status_frame.pack(fill=tk.BOTH, padx=1, pady=1)
 
         self.status_label = tk.Label(
             status_frame,
             text="Status: Ready",
-            font=("Segoe UI", 10),
+            font=("Segoe UI", 11),
             bg="#2a2a2a",
             fg=config.WAVEFORM_TEXT_COLOR,
-            pady=8,
-            padx=10
+            pady=10,
+            padx=12
         )
         self.status_label.pack(fill=tk.X)
 
@@ -253,47 +266,47 @@ class MainWindow:
         style = ttk.Style()
         style.theme_use('clam')
 
-        # Start button style (accent color)
+        # Start button style (accent color) - Enhanced modern look
         style.configure('Start.TButton',
                        background=config.WAVEFORM_ACCENT_COLOR,
                        foreground='white',
                        borderwidth=0,
                        focuscolor='none',
-                       font=('Segoe UI', 10, 'bold'),
-                       padding=10)
+                       font=('Segoe UI', 11, 'bold'),
+                       padding=(12, 10))
         style.map('Start.TButton',
                  background=[('active', config.WAVEFORM_SECONDARY_COLOR)])
 
-        # Stop button style (warning color)
+        # Stop button style (warning color) - Enhanced modern look
         style.configure('Stop.TButton',
                        background='#ff6b6b',
                        foreground='white',
                        borderwidth=0,
                        focuscolor='none',
-                       font=('Segoe UI', 10, 'bold'),
-                       padding=10)
+                       font=('Segoe UI', 11, 'bold'),
+                       padding=(12, 10))
         style.map('Stop.TButton',
                  background=[('active', '#ff5252')])
 
-        # Cancel button style
+        # Cancel button style - Modern sizing
         style.configure('Cancel.TButton',
                        background='#444444',
                        foreground='white',
                        borderwidth=0,
                        focuscolor='none',
-                       font=('Segoe UI', 9),
-                       padding=8)
+                       font=('Segoe UI', 10),
+                       padding=(10, 8))
         style.map('Cancel.TButton',
                  background=[('active', '#555555')])
 
-        # File button style
+        # File button style - Enhanced modern look
         style.configure('File.TButton',
                        background=config.WAVEFORM_SECONDARY_COLOR,
                        foreground='white',
                        borderwidth=0,
                        focuscolor='none',
-                       font=('Segoe UI', 10),
-                       padding=10)
+                       font=('Segoe UI', 11),
+                       padding=(12, 10))
         style.map('File.TButton',
                  background=[('active', '#007aa3')])
 
@@ -333,20 +346,23 @@ class MainWindow:
         )
         self.cancel_button.pack(pady=(0, 15), fill=tk.X)
 
-        # Transcription display section
+        # Transcription display section with modern styling
         transcription_label = tk.Label(
             main_frame,
             text="Transcription",
-            font=("Segoe UI", 10, "bold"),
+            font=("Segoe UI", 11, "bold"),
             bg=config.WAVEFORM_BG_COLOR,
             fg=config.WAVEFORM_ACCENT_COLOR,
             anchor='w'
         )
-        transcription_label.pack(fill=tk.X, pady=(0, 5))
+        transcription_label.pack(fill=tk.X, pady=(0, 8))
 
-        # Scrollable text frame
-        text_frame = tk.Frame(main_frame, bg="#2a2a2a", bd=1, relief=tk.SOLID)
-        text_frame.pack(fill=tk.BOTH, expand=True)
+        # Scrollable text frame with subtle border
+        text_outer = tk.Frame(main_frame, bg=config.WAVEFORM_SECONDARY_COLOR, bd=0)
+        text_outer.pack(fill=tk.BOTH, expand=True)
+
+        text_frame = tk.Frame(text_outer, bg="#2a2a2a", bd=0)
+        text_frame.pack(fill=tk.BOTH, expand=True, padx=1, pady=1)
 
         # Add scrollbar
         scrollbar = tk.Scrollbar(text_frame)
@@ -357,12 +373,12 @@ class MainWindow:
             height=5,
             wrap=tk.WORD,
             relief=tk.FLAT,
-            font=('Segoe UI', 9),
+            font=('Segoe UI', 10),
             bg="#2a2a2a",
             fg=config.WAVEFORM_TEXT_COLOR,
             insertbackground=config.WAVEFORM_ACCENT_COLOR,
-            padx=10,
-            pady=10,
+            padx=12,
+            pady=12,
             yscrollcommand=scrollbar.set
         )
         self.transcription_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)

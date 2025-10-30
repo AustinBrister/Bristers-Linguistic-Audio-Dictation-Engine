@@ -27,7 +27,7 @@ class LoadingScreen:
         try:
             self.root = tk.Tk()
             self.root.title("B.L.A.D.E.")
-            self.root.geometry("400x240")
+            self.root.geometry("450x280")
             self.root.resizable(False, False)
             self.root.attributes('-topmost', True)
             self.root.configure(bg=self._bg_color)
@@ -43,17 +43,17 @@ class LoadingScreen:
             title_label = tk.Label(
                 main_frame,
                 text="B.L.A.D.E.",
-                font=("Segoe UI", 24, "bold"),
+                font=("Segoe UI", 36, "bold"),
                 bg=self._bg_color,
                 fg=self._accent_color,
             )
-            title_label.pack(pady=(0, 5))
+            title_label.pack(pady=(0, 8))
 
-            # Subtitle
+            # Subtitle with modern sizing
             subtitle_label = tk.Label(
                 main_frame,
                 text="Brister's Linguistic Audio Dictation Engine",
-                font=("Segoe UI", 9),
+                font=("Segoe UI", 12),
                 bg=self._bg_color,
                 fg=self._text_secondary,
             )
