@@ -49,33 +49,53 @@ class FFmpegConfigDialog:
         """Create dialog widgets."""
         main_frame = ttk.Frame(self.dialog, padding="10")
         main_frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
-        
+
         # Title
-        title_label = ttk.Label(main_frame, text="FFmpeg Configuration", 
+        title_label = ttk.Label(main_frame, text="FFmpeg Configuration",
                                font=('TkDefaultFont', 12, 'bold'))
         title_label.grid(row=0, column=0, columnspan=2, pady=(0, 10))
-        
+
+        # Check current FFmpeg status
+        from transcriber.local_backend import FFmpegManager
+        detected_ffmpeg = FFmpegManager.detect_ffmpeg()
+        settings = settings_manager.load_all_settings()
+        saved_path = settings.get('ffmpeg_path', '')
+
+        # Determine status message
+        if detected_ffmpeg:
+            if detected_ffmpeg == 'ffmpeg':
+                status_text = "Current status: FFmpeg found in system PATH ✓"
+                status_color = 'green'
+            else:
+                status_text = f"Current status: FFmpeg found at {detected_ffmpeg} ✓"
+                status_color = 'green'
+        elif saved_path and os.path.exists(saved_path):
+            status_text = f"Current status: Using saved path ✓"
+            status_color = 'green'
+        else:
+            status_text = "Current status: FFmpeg not found"
+            status_color = 'red'
+
         # Description
-        desc_text = """FFmpeg is required for local Whisper transcription.
+        desc_text = f"""FFmpeg is required for local Whisper transcription.
 
-Current status: FFmpeg not found in system PATH.
+{status_text}
 
-Please either:
-1. Install FFmpeg to your system PATH, or
-2. Specify the path to your FFmpeg executable below.
+You can:
+1. Use FFmpeg from system PATH (if installed), or
+2. Specify a custom path to your FFmpeg executable below.
 
 Common FFmpeg locations on Windows:
 • C:\\ffmpeg\\bin\\ffmpeg.exe
 • C:\\Program Files\\ffmpeg\\bin\\ffmpeg.exe"""
-        
+
         desc_label = ttk.Label(main_frame, text=desc_text, justify=tk.LEFT)
         desc_label.grid(row=1, column=0, columnspan=2, pady=(0, 15), sticky=tk.W)
-        
+
         # Current saved path
-        settings = settings_manager.load_all_settings()
-        current_path = settings.get('ffmpeg_path', 'Not configured')
-        
-        ttk.Label(main_frame, text="Current FFmpeg path:").grid(row=2, column=0, sticky=tk.W)
+        current_path = saved_path if saved_path else 'Not configured (using system PATH)' if detected_ffmpeg == 'ffmpeg' else 'Not configured'
+
+        ttk.Label(main_frame, text="Saved FFmpeg path:").grid(row=2, column=0, sticky=tk.W)
         path_label = ttk.Label(main_frame, text=current_path, foreground='blue')
         path_label.grid(row=2, column=1, sticky=tk.W, padx=(10, 0))
         
@@ -97,18 +117,44 @@ Common FFmpeg locations on Windows:
     
     def _browse_ffmpeg(self):
         """Browse for FFmpeg executable."""
-        from transcriber.local_backend import FFmpegManager
-        
-        ffmpeg_path = FFmpegManager.prompt_for_ffmpeg_path()
+        from tkinter import filedialog
+        import platform
+
+        # Open file dialog to select ffmpeg.exe
+        if platform.system() == "Windows":
+            file_types = [("Executable files", "*.exe"), ("All files", "*.*")]
+            initial_name = "ffmpeg.exe"
+        else:
+            file_types = [("All files", "*.*")]
+            initial_name = "ffmpeg"
+
+        ffmpeg_path = filedialog.askopenfilename(
+            parent=self.dialog,
+            title="Select FFmpeg Executable",
+            filetypes=file_types,
+            initialfile=initial_name
+        )
+
         if ffmpeg_path:
-            # Save the path
-            settings = settings_manager.load_all_settings()
-            settings['ffmpeg_path'] = ffmpeg_path
-            settings_manager.save_all_settings(settings)
-            
-            messagebox.showinfo("Success", f"FFmpeg path saved: {ffmpeg_path}")
-            self.result = ffmpeg_path
-            self.dialog.destroy()
+            # Verify it's actually ffmpeg
+            import subprocess
+            try:
+                result = subprocess.run([ffmpeg_path, '-version'],
+                                      capture_output=True, text=True, timeout=5)
+                if result.returncode == 0 and 'ffmpeg version' in result.stdout.lower():
+                    # Save the path
+                    settings = settings_manager.load_all_settings()
+                    settings['ffmpeg_path'] = ffmpeg_path
+                    settings_manager.save_all_settings(settings)
+
+                    messagebox.showinfo("Success", f"FFmpeg path saved: {ffmpeg_path}")
+                    self.result = ffmpeg_path
+                    self.dialog.destroy()
+                else:
+                    messagebox.showerror("Invalid File",
+                                       "The selected file is not a valid FFmpeg executable.")
+            except Exception as e:
+                messagebox.showerror("Error", f"Failed to verify FFmpeg: {e}")
     
     def _test_current_path(self):
         """Test the current FFmpeg path."""
