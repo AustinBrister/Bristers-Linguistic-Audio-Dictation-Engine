@@ -27,7 +27,7 @@ class LoadingScreen:
         try:
             self.root = tk.Tk()
             self.root.title("B.L.A.D.E.")
-            self.root.geometry("450x280")
+            self.root.geometry("450x320")
             self.root.resizable(False, False)
             self.root.attributes('-topmost', True)
             self.root.configure(bg=self._bg_color)

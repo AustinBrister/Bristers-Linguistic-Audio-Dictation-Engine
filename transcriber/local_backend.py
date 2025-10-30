@@ -129,12 +129,18 @@ class LocalWhisperBackend(TranscriptionBackend):
     
     def __init__(self, model_name: str = None):
         """Initialize the local Whisper backend.
-        
+
         Args:
             model_name: Whisper model name to use. Uses config default if None.
         """
         super().__init__()
-        self.model_name = model_name or config.DEFAULT_WHISPER_MODEL
+
+        # Load model name from settings if not provided
+        if model_name is None:
+            settings = settings_manager.load_all_settings()
+            model_name = settings.get('whisper_model', config.DEFAULT_WHISPER_MODEL)
+
+        self.model_name = model_name
         self.model: Optional[whisper.Whisper] = None
         self.ffmpeg_configured = False
         self._setup_ffmpeg()

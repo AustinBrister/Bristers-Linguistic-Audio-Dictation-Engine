@@ -196,6 +196,7 @@ class MainWindow:
         settings_menu.add_command(label="Configure Hotkeys", command=self.open_hotkey_settings)
         settings_menu.add_command(label="Waveform Style...", command=self.open_waveform_style_settings)
         settings_menu.add_command(label="Configure FFmpeg...", command=self.configure_ffmpeg)
+        settings_menu.add_command(label="Whisper Models...", command=self.open_whisper_models)
         
 
         # Main frame with padding - use tk.Frame for custom background
@@ -693,6 +694,18 @@ class MainWindow:
         except Exception as e:
             logging.error(f"Failed to open FFmpeg dialog: {e}")
             messagebox.showerror("Error", f"Failed to open FFmpeg configuration: {e}")
+
+    def open_whisper_models(self):
+        """Open Whisper model management dialog."""
+        try:
+            from .whisper_model_dialog import WhisperModelDialog
+            # Pass the local whisper backend so models can be reloaded without restart
+            backend = self.transcription_backends.get('local_whisper')
+            dialog = WhisperModelDialog(self.root, backend)
+            dialog.show()
+        except Exception as e:
+            logging.error(f"Failed to open Whisper model dialog: {e}")
+            messagebox.showerror("Error", f"Failed to open Whisper model settings: {e}")
 
     def open_audio_file(self):
         """Open an existing audio file for transcription."""
