@@ -15,31 +15,32 @@ class WhisperModelDialog:
     """Dialog for managing Whisper models."""
 
     # Model information: name, size, description
+    # Using English-only models (.en) for better performance and accuracy
     MODELS = {
-        'tiny': {
+        'tiny.en': {
             'size': '~75 MB',
-            'description': 'Fastest, least accurate. Good for quick drafts.',
+            'description': 'Fastest, least accurate. Good for quick drafts. English-only.',
             'speed': 'Very Fast'
         },
-        'base': {
+        'base.en': {
             'size': '~145 MB',
-            'description': 'Balanced speed and accuracy. Recommended for most users.',
+            'description': 'Balanced speed and accuracy. Recommended for most users. English-only.',
             'speed': 'Fast',
             'recommended': True
         },
-        'small': {
+        'small.en': {
             'size': '~470 MB',
-            'description': 'Better accuracy, slower processing.',
+            'description': 'Better accuracy, slower processing. English-only.',
             'speed': 'Moderate'
         },
-        'medium': {
+        'medium.en': {
             'size': '~1.5 GB',
-            'description': 'High accuracy, significantly slower.',
+            'description': 'High accuracy, significantly slower. English-only.',
             'speed': 'Slow'
         },
-        'large': {
+        'large-v2': {
             'size': '~3 GB',
-            'description': 'Best accuracy, very slow processing.',
+            'description': 'Best accuracy, very slow processing. Multi-language (no .en variant available).',
             'speed': 'Very Slow'
         }
     }

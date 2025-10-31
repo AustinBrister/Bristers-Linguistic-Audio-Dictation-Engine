@@ -31,7 +31,19 @@ class LoadingScreen:
             self.root.resizable(False, False)
             self.root.attributes('-topmost', True)
             self.root.configure(bg=self._bg_color)
-            
+
+            # Set window icon
+            try:
+                import os
+                icon_path = os.path.join(os.path.dirname(__file__), 'icon.png')
+                from PIL import Image, ImageTk
+                icon_image = Image.open(icon_path)
+                self._icon_photo = ImageTk.PhotoImage(icon_image)
+                self.root.iconphoto(True, self._icon_photo)
+                logging.info(f"Loading screen icon set from {icon_path}")
+            except Exception as e:
+                logging.warning(f"Failed to set loading screen icon: {e}")
+
             # Center the loading screen
             self.root.eval('tk::PlaceWindow . center')
             

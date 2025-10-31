@@ -128,6 +128,18 @@ class MainWindow:
         self.root.geometry("480x450")
         self.root.withdraw()  # Hide initially
         self.root.configure(bg=config.WAVEFORM_BG_COLOR)
+
+        # Set window icon
+        try:
+            icon_path = os.path.join(os.path.dirname(__file__), 'icon.png')
+            from PIL import Image, ImageTk
+            icon_image = Image.open(icon_path)
+            # Keep reference to prevent garbage collection
+            self._icon_photo = ImageTk.PhotoImage(icon_image)
+            self.root.iconphoto(True, self._icon_photo)
+            logging.info(f"Window icon set from {icon_path}")
+        except Exception as e:
+            logging.warning(f"Failed to set window icon: {e}")
         
         # Initialize components
         self.recorder = AudioRecorder()
@@ -403,6 +415,8 @@ class MainWindow:
             on_show=self.show_window,
             on_quit=self.quit_app
         )
+        # Show tray icon immediately on startup
+        self.tray_manager.show_tray()
     
     def _setup_audio_level_callback(self):
         """Setup audio level callback for waveform overlay."""

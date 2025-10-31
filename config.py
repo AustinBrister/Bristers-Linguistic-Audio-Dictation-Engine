@@ -71,7 +71,7 @@ class AppConfig:
     OVERLAP_DURATION_SEC: float = 2.0  # Overlap between chunks to avoid word cutoffs
     
     # Whisper model
-    DEFAULT_WHISPER_MODEL: str = "base"
+    DEFAULT_WHISPER_MODEL: str = "base.en"
     
     # Waveform style settings
     CURRENT_WAVEFORM_STYLE: str = "particle"

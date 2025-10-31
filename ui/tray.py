@@ -26,6 +26,7 @@ class TrayManager:
             import os
             icon_path = os.path.join(os.path.dirname(__file__), 'icon.png')
             icon_data = Image.open(icon_path)
+            logging.info(f"System tray icon loaded from {icon_path}")
         except Exception as e:
             logging.error(f"Failed to load icon from ui/icon.png: {e}")
             # Fallback to simple icon
